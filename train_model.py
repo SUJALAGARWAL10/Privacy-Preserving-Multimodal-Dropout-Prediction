@@ -1,25 +1,30 @@
 import pandas as pd
+import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-import joblib
+from sklearn.metrics import classification_report
 
-# Load dataset
 data = pd.read_csv("student_data.csv")
 
-# Features and target
-X = data.drop("dropout", axis=1)   # column name must match CSV
+X = data.drop("dropout",axis=1)
 y = data["dropout"]
 
-# Split data
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
+X_train,X_test,y_train,y_test = train_test_split(
+    X,y,test_size=0.2,random_state=42
 )
 
-# Train model
-model = RandomForestClassifier()
-model.fit(X_train, y_train)
+model = RandomForestClassifier(
+    n_estimators=200,
+    max_depth=8,
+    random_state=42
+)
 
-# Save model
-joblib.dump(model, "dropout_model.pkl")
+model.fit(X_train,y_train)
 
-print("Model Trained and Saved Successfully ✅")
+pred = model.predict(X_test)
+
+print(classification_report(y_test,pred))
+
+joblib.dump(model,"dropout_model.pkl")
+
+print("Model trained and saved")
